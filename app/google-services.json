@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "616608320922",
+    "project_id": "boostersau",
+    "storage_bucket": "boostersau.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:616608320922:android:e61d3cd854b581568afe23",
+        "android_client_info": {
+          "package_name": "com.boosterstestmovis"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "616608320922-ak85gvu2tmkik38fcov0jiln05lq7ro7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.boosterstestmovis",
+            "certificate_hash": "834918175a3a135fd679e10c0d75cf0b9551695a"
+          }
+        },
+        {
+          "client_id": "616608320922-3j4m9kij676n6h2mqej8bn5sa8bai79d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCrb3Vl_Pux1GB0dgUTbjQke2WYgNleLII"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "616608320922-0ej0lbbfl0fdl51q47n2k5bp7c5vhhqq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
