@@ -1,4 +1,4 @@
-package com.boosterstestmovis.domain
+package com.boosterstestmovis.domain.entity
 
 data class Review(
     val author:String,

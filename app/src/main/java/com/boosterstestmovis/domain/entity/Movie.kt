@@ -1,4 +1,4 @@
-package com.boosterstestmovis.domain
+package com.boosterstestmovis.domain.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -54,4 +54,9 @@ open class Movie(
     ) : this(
         0, id, voteCount, title, originalTitle, overview, posterPath, bigPosterPath, backdropPath, voteAverage, releaseDate
     )
+
+    override fun toString(): String {
+        return "Movie(uniqueId=$uniqueId, id=$id, voteCount=$voteCount, title='$title', originalTitle='$originalTitle', overview='$overview', posterPath='$posterPath', bigPosterPath='$bigPosterPath', backdropPath='$backdropPath', voteAverage=$voteAverage, releaseDate='$releaseDate')"
+    }
+
 }

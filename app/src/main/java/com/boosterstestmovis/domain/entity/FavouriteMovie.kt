@@ -1,4 +1,4 @@
-package com.boosterstestmovis.domain
+package com.boosterstestmovis.domain.entity
 
 import androidx.room.Entity
 import androidx.room.Ignore
@@ -43,4 +43,5 @@ class FavouriteMovie(
         movie.voteAverage,
         movie.releaseDate
     )
+
 }
