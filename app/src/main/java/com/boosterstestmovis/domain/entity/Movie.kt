@@ -1,44 +1,84 @@
 package com.boosterstestmovis.domain.entity
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 import androidx.room.Ignore
-import com.google.gson.annotations.SerializedName
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 
 @Entity(tableName = "movies")
-open class Movie(
+open class Movie {
     @PrimaryKey(autoGenerate = true)
-    val uniqueId: Int = 0,
+    var uniqueId: Int = 0
+
+    @SerializedName("adult")
+    @Expose
+    var isAdult: Boolean = false
+
     @SerializedName("id")
     @Expose
-    val id: Int,
+    var id: Int
+
     @SerializedName("vote_count")
     @Expose
-    val voteCount: Int,
+    var voteCount: Int
+
     @SerializedName("title")
     @Expose
-    val title: String,
+    var title: String
+
     @SerializedName("original_title")
     @Expose
-    val originalTitle: String,
+    var originalTitle: String
+
     @SerializedName("overview")
     @Expose
-    val overview: String,
+    var overview: String
+
+    @SerializedName("popularity")
+    @Expose
+    var popularity: Double = 0.0
+
     @SerializedName("poster_path")
     @Expose
-    val posterPath: String,
-    val bigPosterPath: String,
+    var posterPath: String
+
     @SerializedName("backdrop_path")
     @Expose
-    val backdropPath: String,
+    var backdropPath: String
+
     @SerializedName("vote_average")
     @Expose
-    val voteAverage: Double,
+    var voteAverage: Double
+
     @SerializedName("release_date")
     @Expose
-    val releaseDate: String
-) {
+    var releaseDate: String
+
+    constructor(
+        uniqueId: Int,
+        id: Int,
+        voteCount: Int,
+        title: String,
+        originalTitle: String,
+        overview: String,
+        posterPath: String,
+        backdropPath: String,
+        voteAverage: Double,
+        releaseDate: String
+    ) {
+        this.uniqueId = uniqueId
+        this.id = id
+        this.voteCount = voteCount
+        this.title = title
+        this.originalTitle = originalTitle
+        this.overview = overview
+        this.posterPath = posterPath
+        this.backdropPath = backdropPath
+        this.voteAverage = voteAverage
+        this.releaseDate = releaseDate
+    }
+
     @Ignore
     constructor(
         id: Int,
@@ -47,16 +87,24 @@ open class Movie(
         originalTitle: String,
         overview: String,
         posterPath: String,
-        bigPosterPath: String,
         backdropPath: String,
         voteAverage: Double,
         releaseDate: String
-    ) : this(
-        0, id, voteCount, title, originalTitle, overview, posterPath, bigPosterPath, backdropPath, voteAverage, releaseDate
-    )
+    ) {
+        this.id = id
+        this.voteCount = voteCount
+        this.title = title
+        this.originalTitle = originalTitle
+        this.overview = overview
+        this.posterPath = posterPath
+        this.backdropPath = backdropPath
+        this.voteAverage = voteAverage
+        this.releaseDate = releaseDate
+    }
 
     override fun toString(): String {
-        return "Movie(uniqueId=$uniqueId, id=$id, voteCount=$voteCount, title='$title', originalTitle='$originalTitle', overview='$overview', posterPath='$posterPath', bigPosterPath='$bigPosterPath', backdropPath='$backdropPath', voteAverage=$voteAverage, releaseDate='$releaseDate')"
+        return "Movie(uniqueId=$uniqueId, isAdult=$isAdult, id=$id, voteCount=$voteCount, title='$title', originalTitle='$originalTitle', overview='$overview', popularity=$popularity, posterPath='$posterPath', backdropPath='$backdropPath', voteAverage=$voteAverage, releaseDate='$releaseDate')"
     }
 
 }
+

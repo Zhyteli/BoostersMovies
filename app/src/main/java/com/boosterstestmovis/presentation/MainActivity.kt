@@ -11,7 +11,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.boosterstestmovis.domain.entity.FavouriteMovie
 import com.boosterstestmovis.presentation.viewmodel.MovieViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -23,26 +22,12 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-//            var click by remember {
-//                mutableStateOf(false)
-//            }
-//            Box(modifier = Modifier.fillMaxSize()) {
-//                Button(onClick = {
-//                    click = true
-//                }, modifier = Modifier.align(Alignment.Center)) {
-//                    Text(text = "Authorization via Google")
-//                }
-//                if (click) {
-////                    AuthorizationViaGoogle(Modifier.align(Alignment.Center))
-//                signInWithGoogle(this@MainActivity)
-//                }
-//            }
             DataFon()
-
         }
     }
 
@@ -78,7 +63,11 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun DataFon(model: MovieViewModel = viewModel()) {
+    model.startState()
 
+    val f = model.movieList.collectAsState().value
+
+    Log.d("TEST_MOVIE", f.toString())
 }
 
 fun getGoogleSignInClient(context: Context): GoogleSignInClient {

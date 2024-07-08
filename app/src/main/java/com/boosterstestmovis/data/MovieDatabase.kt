@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 import com.boosterstestmovis.domain.entity.FavouriteMovie
 import com.boosterstestmovis.domain.entity.Movie
 
-@Database(entities = [Movie::class, FavouriteMovie::class], version = 1, exportSchema = false)
+@Database(entities = [Movie::class, FavouriteMovie::class], version = 2, exportSchema = false)
 abstract class MovieDatabase : RoomDatabase() {
     abstract fun movieDao(): MovieDao
 }
