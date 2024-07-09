@@ -1,11 +1,8 @@
 package com.boosterstestmovis.data.api
 
 import com.boosterstestmovis.data.pojo.MovieResponse
-import com.boosterstestmovis.data.pojo.ReviewResponse
-import com.boosterstestmovis.data.pojo.TrailerResponse
 import retrofit2.Response
 import retrofit2.http.GET
-import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {

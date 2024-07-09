@@ -11,25 +11,43 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.boosterstestmovis.domain.entity.FavouriteMovie
 import com.boosterstestmovis.domain.entity.Movie
 
 @Composable
-fun ItemList(list: List<Movie>, onLoadMore: () -> Unit) {
+fun ItemList(list: List<Movie>, onLoadMore: () -> Unit = {}) {
+    val sortedList = list.sortedByDescending { it.releaseDate }
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        itemsIndexed(list) { index, movie ->
+        itemsIndexed(sortedList) { index, movie ->
             MovieCardItem(
-                posterPath = movie.posterPath,
-                movieName = movie.title,
-                description = movie.overview,
-                rating = movie.voteAverage.toDouble()
+                movie
             )
             // Check if we have reached the end of the list
-            if (index == list.size - 3) {
+            if (index == sortedList.size - 3) {
                 onLoadMore()
             }
+        }
+        // Add a loading indicator at the end
+        item {
+            CircularProgressIndicator(modifier = Modifier.padding(16.dp).fillMaxWidth())
+        }
+    }
+}
+@Composable
+fun FavoriteList(list: List<FavouriteMovie>) {
+    val uniqueList = list.distinctBy { it.id }
+
+    LazyColumn(
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        itemsIndexed(uniqueList) { _, movie ->
+            MovieCardItem(
+                movie
+            )
         }
         // Add a loading indicator at the end
         item {
