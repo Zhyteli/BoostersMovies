@@ -55,10 +55,38 @@ class MovieViewModel @Inject constructor(
     private val _emptyList = MutableStateFlow(true)
     val emptyList: StateFlow<Boolean> get() = _emptyList
 
-    private fun loadingMovies() {
+    private var currentPage = 0
+
+    private fun fetchMoviesFromApi(page: Int) {
+        viewModelScope.launch {
+            try {
+                val response = apiService.getMovieResponse(
+                    language = Locale.getDefault().language,
+                    sort = ApiParams.PRIMARY_RELEASE_DATA,
+                    minVoteCountValue = "100",
+                    page = page.toString()
+                )
+                if (response.isSuccessful) {
+                    val movie = response.body()?.movies ?: emptyList()
+                    state.emit(StateScreenUI.Content(movie))
+                    _movieList.value += movie
+                    if (page == 1) {
+                        insertMovieUseCase(movie)
+                    }
+                } else {
+                    fetchMoviesFromDb() // Fallback to DB in case of API error
+                }
+            } catch (e: Exception) {
+                fetchMoviesFromDb() // Fallback to DB in case of exception
+            }
+        }
+    }
+
+    fun loadingMovies() {
         viewModelScope.launch {
             if (NetworkUtil.isNetworkAvailable(application)) {
-                fetchMoviesFromApi()
+                currentPage++
+                fetchMoviesFromApi(currentPage)
             } else {
                 movieList.collect {
                     if (it.isEmpty()) {
@@ -74,11 +102,13 @@ class MovieViewModel @Inject constructor(
             state.collect {
                 when (it) {
                     StateScreenUI.Loading -> {
-                        loadingMovies()
+                        if (currentPage == 0){
+                            loadingMovies()
+                        }
                     }
+
                     is StateScreenUI.Content -> {
                         _emptyList.value = false
-                        _movieList.value = it.movie
                     }
 
                     is StateScreenUI.Error -> {
@@ -98,42 +128,12 @@ class MovieViewModel @Inject constructor(
         }
     }
 
-    private fun fetchMoviesFromApi() {
-        viewModelScope.launch {
-            try {
-                val response = apiService.getMovieResponse(
-                    language = Locale.getDefault().language,
-                    sort = ApiParams.PRIMARY_RELEASE_DATA,
-                    minVoteCountValue = "100",
-                    page = "1"
-                )
-                if (response.isSuccessful) {
-                    val movie = response.body()?.movies
-                    val page = response.body()?.page
-                    Log.d("TEST_1_GET_MOVIE", movie.toString())
-                    if (movie != null) {
-                        state.emit(StateScreenUI.Content(movie))
-                        if (page == 1) {
-                            insertMovieUseCase(movie)
-                        }
-                    }
-                } else {
-                    val error = response.errorBody()?.string().toString()
-                    Log.d("TEST_2_GET_ERROR_RESPONSE", error)
-                    fetchMoviesFromDb() // Fallback to DB in case of API error
-                }
-            } catch (e: Exception) {
-                Log.d("TEST_FATAL", e.toString())
-                fetchMoviesFromDb() // Fallback to DB in case of exception
-            }
-        }
-    }
-
     private fun fetchMoviesFromDb() {
         viewModelScope.launch {
             val movies = getAllMoviesUseCase().firstOrNull().orEmpty()
             if (movies.isNotEmpty()) {
                 state.emit(StateScreenUI.Content(movies))
+                _movieList.value += movies
             }
         }
     }

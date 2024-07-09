@@ -1,22 +1,39 @@
 package com.boosterstestmovis.presentation.ui.item
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.boosterstestmovis.R
+import androidx.compose.ui.unit.dp
 import com.boosterstestmovis.domain.entity.Movie
 
 @Composable
-fun ItemList(list: List<Movie>) {
-    LazyColumn {
-        items(list) { movie ->
+fun ItemList(list: List<Movie>, onLoadMore: () -> Unit) {
+    LazyColumn(
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        itemsIndexed(list) { index, movie ->
             MovieCardItem(
-                posterPath = movie.posterPath, // Replace with your image resource or use a loader for image URLs
+                posterPath = movie.posterPath,
                 movieName = movie.title,
                 description = movie.overview,
-                rating = movie.voteAverage
+                rating = movie.voteAverage.toDouble()
             )
+            // Check if we have reached the end of the list
+            if (index == list.size - 3) {
+                onLoadMore()
+            }
+        }
+        // Add a loading indicator at the end
+        item {
+            CircularProgressIndicator(modifier = Modifier.padding(16.dp).fillMaxWidth())
         }
     }
 }
@@ -50,5 +67,7 @@ fun ItemListPreview() {
                 releaseDate = "2024-07-09"
             )
         )
-    )
+    ){
+
+    }
 }

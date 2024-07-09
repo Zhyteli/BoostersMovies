@@ -65,19 +65,19 @@ class MainActivity : ComponentActivity() {
 }
 
 
-
 @Composable
 fun DataFon(model: MovieViewModel = viewModel()) {
     model.startState()
 
     val empty = model.emptyList.collectAsState().value
-    val f = model.movieList.collectAsState().value
-    if (empty){
+    val movies  = model.movieList.collectAsState().value
+    if (empty) {
         EmptyListAnim()
+    }else{
+        ItemList(movies, onLoadMore = { model.loadingMovies() })
+        Log.d("TEST_MOVIE", movies.toString())
     }
 
-    ItemList(f)
-    Log.d("TEST_MOVIE", f.toString())
 }
 
 fun getGoogleSignInClient(context: Context): GoogleSignInClient {
