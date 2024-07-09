@@ -1,4 +1,4 @@
-package com.boosterstestmovis.presentation
+package com.boosterstestmovis.presentation.activity
 
 import android.app.Activity
 import android.content.Context
@@ -11,11 +11,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.boosterstestmovis.presentation.ui.item.ItemList
+import com.boosterstestmovis.presentation.ui.item.empty.EmptyListAnim
 import com.boosterstestmovis.presentation.viewmodel.MovieViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.play.integrity.internal.f
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import dagger.hilt.android.AndroidEntryPoint
@@ -61,12 +64,19 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
+
 @Composable
 fun DataFon(model: MovieViewModel = viewModel()) {
     model.startState()
 
+    val empty = model.emptyList.collectAsState().value
     val f = model.movieList.collectAsState().value
+    if (empty){
+        EmptyListAnim()
+    }
 
+    ItemList(f)
     Log.d("TEST_MOVIE", f.toString())
 }
 

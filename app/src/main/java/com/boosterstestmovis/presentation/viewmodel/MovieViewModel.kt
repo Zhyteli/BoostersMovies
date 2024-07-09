@@ -3,7 +3,6 @@ package com.boosterstestmovis.presentation.viewmodel
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boosterstestmovis.data.api.ApiParams
 import com.boosterstestmovis.data.api.ApiService
@@ -25,7 +24,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
@@ -54,6 +52,9 @@ class MovieViewModel @Inject constructor(
     private val _movieList = MutableStateFlow<List<Movie>>(emptyList())
     val movieList: StateFlow<List<Movie>> get() = _movieList
 
+    private val _emptyList = MutableStateFlow(true)
+    val emptyList: StateFlow<Boolean> get() = _emptyList
+
     private fun loadingMovies() {
         viewModelScope.launch {
             if (NetworkUtil.isNetworkAvailable(application)) {
@@ -76,6 +77,7 @@ class MovieViewModel @Inject constructor(
                         loadingMovies()
                     }
                     is StateScreenUI.Content -> {
+                        _emptyList.value = false
                         _movieList.value = it.movie
                     }
 
@@ -101,7 +103,7 @@ class MovieViewModel @Inject constructor(
             try {
                 val response = apiService.getMovieResponse(
                     language = Locale.getDefault().language,
-                    sort = ApiParams.VOTE_AVERAGE_DESC,
+                    sort = ApiParams.PRIMARY_RELEASE_DATA,
                     minVoteCountValue = "100",
                     page = "1"
                 )
@@ -121,6 +123,7 @@ class MovieViewModel @Inject constructor(
                     fetchMoviesFromDb() // Fallback to DB in case of API error
                 }
             } catch (e: Exception) {
+                Log.d("TEST_FATAL", e.toString())
                 fetchMoviesFromDb() // Fallback to DB in case of exception
             }
         }
