@@ -32,14 +32,12 @@ import javax.inject.Inject
 @HiltViewModel
 class MovieViewModel @Inject constructor(
     private val application: Application,
-
     private val getAllMoviesUseCase: GetAllMoviesUseCase,
     private val getAllFavouriteMoviesUseCase: GetAllFavouriteMoviesUseCase,
     private val getFavouriteMovieByIdUseCase: GetFavouriteMovieByIdUseCase,
     private val insertMovieUseCase: InsertMovieUseCase,
     private val insertFavouriteMovieUseCase: InsertFavouriteMovieUseCase,
     private val deleteFavouriteMovieUseCase: DeleteFavouriteMovieUseCase,
-
     private val apiService: ApiService
 ) : AndroidViewModel(application) {
 
@@ -69,21 +67,24 @@ class MovieViewModel @Inject constructor(
                     page = page.toString()
                 )
                 if (response.isSuccessful) {
-                    val movie = response.body()?.movies ?: emptyList()
-                    state.emit(StateScreenUI.Content(movie))
-                    _movieList.value += movie
+                    val movies = response.body()?.movies.orEmpty()
+                    state.emit(StateScreenUI.Content(movies))
+                    _movieList.value += movies
                     if (page == 1) {
-                        insertMovieUseCase(movie)
+                        insertMovieUseCase(movies)
                     }
                 } else {
-                    state.value = (StateScreenUI.Error(response.errorBody()?.string().toString()))
-                    fetchMoviesFromDb() // Fallback to DB in case of API error
+                    handleError(response.errorBody()?.string().toString())
                 }
             } catch (e: Exception) {
-                state.value = (StateScreenUI.Error(e.message.toString()))
-                fetchMoviesFromDb() // Fallback to DB in case of exception
+                handleError(e.message.toString())
             }
         }
+    }
+
+    private fun handleError(errorMessage: String) {
+        state.value = StateScreenUI.Error(errorMessage)
+        fetchMoviesFromDb()
     }
 
     private fun loadingMovies() {
@@ -92,11 +93,15 @@ class MovieViewModel @Inject constructor(
                 currentPage++
                 fetchMoviesFromApi(currentPage)
             } else {
-                movieList.collect {
-                    if (it.isEmpty()) {
-                        fetchMoviesFromDb()
-                    }
-                }
+                fetchMoviesFromDbIfEmpty()
+            }
+        }
+    }
+
+    private suspend fun fetchMoviesFromDbIfEmpty() {
+        movieList.collect {
+            if (it.isEmpty()) {
+                fetchMoviesFromDb()
             }
         }
     }
@@ -109,39 +114,28 @@ class MovieViewModel @Inject constructor(
         state.tryEmit(StateScreenUI.Refreshing)
     }
 
-
     private fun startState() {
         viewModelScope.launch {
-            state.collect {
-                when (it) {
+            state.collect { state ->
+                when (state) {
                     StateScreenUI.Loading -> {
-                        if (currentPage == 0) {
-                            loadingMovies()
-                        }
+                        if (currentPage == 0) loadingMovies()
                     }
-
-                    is StateScreenUI.Content -> {
-                        _emptyList.value = false
-                    }
-
-                    is StateScreenUI.Error -> {
-                        _errorVis.value = it.error
-                    }
-
-                    StateScreenUI.LoadingMore -> {
-                        loadingMovies()
-                    }
-
-                    StateScreenUI.Refreshing -> {
-                        currentPage = 0
-                        _emptyList.value = true
-                        viewModelScope.launch {
-                            delay(1000)
-                            loadingMovies()
-                        }
-                    }
+                    is StateScreenUI.Content -> _emptyList.value = false
+                    is StateScreenUI.Error -> _errorVis.value = state.error
+                    StateScreenUI.LoadingMore -> loadingMovies()
+                    StateScreenUI.Refreshing -> refreshMovies()
                 }
             }
+        }
+    }
+
+    private fun refreshMovies() {
+        viewModelScope.launch {
+            currentPage = 0
+            _emptyList.value = true
+            delay(1000)
+            loadingMovies()
         }
     }
 
@@ -169,5 +163,4 @@ class MovieViewModel @Inject constructor(
     fun deleteFavouriteMovie(movie: FavouriteMovie) = viewModelScope.launch {
         deleteFavouriteMovieUseCase(movie)
     }
-
 }

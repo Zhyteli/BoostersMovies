@@ -30,7 +30,9 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun EmptyListAnim() {
     val list = arrayOfNulls<Int>(6)
-    Box(modifier = Modifier.fillMaxSize()){
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(Color(0xFFFFE3CA))) {
         LazyColumn(Modifier.align(Alignment.Center)) {
             items(list) {
                 EmptyItem()
@@ -71,15 +73,17 @@ fun EmptyItem() {
             containerColor = Color.Transparent
         )
     ) {
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .background(gradient))
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(gradient)
+        )
     }
 }
 
 
 @Preview
 @Composable
-fun EmptyListAnimPreview(){
+fun EmptyListAnimPreview() {
     EmptyListAnim()
 }

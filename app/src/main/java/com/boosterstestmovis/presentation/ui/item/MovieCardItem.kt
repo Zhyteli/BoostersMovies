@@ -1,13 +1,26 @@
 package com.boosterstestmovis.presentation.ui.item
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateValue
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -29,12 +42,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -46,6 +62,9 @@ import com.boosterstestmovis.presentation.ui.item.ImageLink.BASE_POSTER_URL
 import com.boosterstestmovis.presentation.ui.item.ImageLink.SMALL_POSTER_SIZE
 import com.boosterstestmovis.presentation.ui.item.anim.LoadingImageAnim
 import com.boosterstestmovis.presentation.viewmodel.MovieViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 @Composable
 fun MovieCardItem(
@@ -111,6 +130,7 @@ fun MovieCardItem(
     }
 }
 
+
 @Composable
 private fun MovieCard(
     loading: Boolean,
@@ -122,6 +142,8 @@ private fun MovieCard(
     isFavorite: Boolean,
     onFavoriteClick: () -> Unit
 ) {
+    var showSmallFavorites by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier
             .padding(8.dp)
@@ -202,11 +224,25 @@ private fun MovieCard(
                         ),
                         color = Color.DarkGray,
                     )
-                    IconButton(onClick = onFavoriteClick) {
-                        Icon(
-                            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                            contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites"
-                        )
+                    Box {
+                        IconButton(
+                            onClick = {
+                                onFavoriteClick()
+                                if(!isFavorite){
+                                    showSmallFavorites = true
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites"
+                            )
+                        }
+                        if (showSmallFavorites) {
+                            SmallFavoritesExplosion {
+                                showSmallFavorites = false
+                            }
+                        }
                     }
                 }
             }
@@ -214,6 +250,54 @@ private fun MovieCard(
     }
 }
 
+@Composable
+fun SmallFavoritesExplosion(onAnimationEnd: () -> Unit) {
+    val random = Random.Default
+    val favoriteCount = 10
+    val targetOffsets = remember {
+        List(favoriteCount) { Offset(random.nextFloat() * 200 - 100, random.nextFloat() * 200 - 100) }
+    }
+
+    val animatedOffsets = remember {
+        List(favoriteCount) { Animatable(Offset(0f, 0f), Offset.VectorConverter) }
+    }
+
+    val alpha = remember { Animatable(1f) }
+
+    LaunchedEffect(Unit) {
+        targetOffsets.forEachIndexed { index, targetOffset ->
+            launch {
+                animatedOffsets[index].animateTo(
+                    targetValue = targetOffset,
+                    animationSpec = tween(durationMillis = 600, easing = FastOutSlowInEasing)
+                )
+            }
+        }
+        alpha.animateTo(
+            targetValue = 0f,
+            animationSpec = tween(durationMillis = 600, easing = FastOutSlowInEasing)
+        )
+        delay(600)
+        onAnimationEnd()
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        animatedOffsets.forEach { animatedOffset ->
+            Icon(
+                imageVector = Icons.Filled.Favorite,
+                contentDescription = null,
+                modifier = Modifier
+                    .offset(animatedOffset.value.x.dp, animatedOffset.value.y.dp)
+                    .alpha(alpha.value)
+                    .size(24.dp),
+                tint = Color.Red.copy(alpha = alpha.value)
+            )
+        }
+    }
+}
 @Preview
 @Composable
 fun MovieCardItemPreview() {

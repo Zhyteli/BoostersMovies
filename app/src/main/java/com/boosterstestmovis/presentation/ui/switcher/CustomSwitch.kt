@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -28,7 +29,7 @@ fun CustomSwitch(
     Row(
         Modifier
             .padding(8.dp)
-            .background(Color.White, shape = RoundedCornerShape(16.dp))
+            .background(Color(0xFFFFE3CA), shape = RoundedCornerShape(16.dp))
             .border(1.dp, Color.Gray, shape = RoundedCornerShape(16.dp))
             .clickable(
                 indication = null, // Disable the ripple effect
