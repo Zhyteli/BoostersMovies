@@ -20,6 +20,7 @@ import com.boosterstestmovis.domain.usecase.InsertFavouriteMovieUseCase
 import com.boosterstestmovis.domain.usecase.InsertMovieUseCase
 import com.boosterstestmovis.presentation.ui.state.StateScreenUI
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -97,6 +98,18 @@ class MovieViewModel @Inject constructor(
         }
     }
 
+    fun loadingMore(){
+        state.tryEmit(StateScreenUI.LoadingMore)
+    }
+
+    fun update(){
+        state.tryEmit(StateScreenUI.Refreshing)
+    }
+
+    init {
+        startState()
+    }
+
     fun startState() {
         viewModelScope.launch {
             state.collect {
@@ -117,11 +130,16 @@ class MovieViewModel @Inject constructor(
 
 
                     StateScreenUI.LoadingMore -> {
-
+                        loadingMovies()
                     }
 
                     StateScreenUI.Refreshing -> {
-
+                        currentPage = 0
+                        _emptyList.value = true
+                        viewModelScope.launch {
+                            delay(1000)
+                            loadingMovies()
+                        }
                     }
                 }
             }
