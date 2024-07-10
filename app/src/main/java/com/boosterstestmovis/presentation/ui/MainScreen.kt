@@ -1,5 +1,6 @@
 package com.boosterstestmovis.presentation.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.boosterstestmovis.domain.entity.Movie
+import com.boosterstestmovis.presentation.ui.error.ErrorDialog
 import com.boosterstestmovis.presentation.ui.item.list.FavoriteList
 import com.boosterstestmovis.presentation.ui.item.list.ItemList
 import com.boosterstestmovis.presentation.ui.switcher.CustomSwitch
@@ -23,14 +25,12 @@ fun MainScreen(
 ) {
     var isSwitchChecked by remember { mutableStateOf(true) }
     val favoriteMovies = model.allFavouriteMovies.collectAsState().value
-
     Box(Modifier.fillMaxSize()) {
         Column {
             CustomSwitch(
                 isChecked = isSwitchChecked,
                 onCheckedChange = { isSwitchChecked = it }
             )
-
             if (isSwitchChecked) {
                 ItemList(movies,
                     onLoadMore = {
@@ -42,8 +42,8 @@ fun MainScreen(
                 )
             } else {
                 FavoriteList(favoriteMovies)
-
             }
         }
+
     }
 }

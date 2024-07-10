@@ -3,6 +3,7 @@ package com.boosterstestmovis.presentation.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.boosterstestmovis.presentation.ui.error.ErrorDialog
 import com.boosterstestmovis.presentation.ui.item.empty.EmptyListAnim
 import com.boosterstestmovis.presentation.viewmodel.MovieViewModel
 
@@ -10,9 +11,13 @@ import com.boosterstestmovis.presentation.viewmodel.MovieViewModel
 fun Switcher(model: MovieViewModel = viewModel()) {
     val empty = model.emptyList.collectAsState().value
     val movies = model.movieList.collectAsState().value
+    val error = model.errorVis.collectAsState().value
     if (empty) {
         EmptyListAnim()
     } else {
         MainScreen(movies, model)
+    }
+    if (error != ""){
+        ErrorDialog(message = error)
     }
 }

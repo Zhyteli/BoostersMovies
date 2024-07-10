@@ -1,21 +1,18 @@
 package com.boosterstestmovis.presentation.viewmodel
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.boosterstestmovis.data.api.ApiParams
 import com.boosterstestmovis.data.api.ApiService
 import com.boosterstestmovis.data.api.connectivity.NetworkUtil
+import com.boosterstestmovis.data.api.connectivity.SettingsResponse
 import com.boosterstestmovis.domain.entity.FavouriteMovie
 import com.boosterstestmovis.domain.entity.Movie
-import com.boosterstestmovis.domain.usecase.DeleteAllMoviesUseCase
 import com.boosterstestmovis.domain.usecase.DeleteFavouriteMovieUseCase
-import com.boosterstestmovis.domain.usecase.DeleteMovieUseCase
 import com.boosterstestmovis.domain.usecase.GetAllFavouriteMoviesUseCase
 import com.boosterstestmovis.domain.usecase.GetAllMoviesUseCase
 import com.boosterstestmovis.domain.usecase.GetFavouriteMovieByIdUseCase
-import com.boosterstestmovis.domain.usecase.GetMovieByIdUseCase
 import com.boosterstestmovis.domain.usecase.InsertFavouriteMovieUseCase
 import com.boosterstestmovis.domain.usecase.InsertMovieUseCase
 import com.boosterstestmovis.presentation.ui.state.StateScreenUI
@@ -53,15 +50,22 @@ class MovieViewModel @Inject constructor(
     private val _emptyList = MutableStateFlow(true)
     val emptyList: StateFlow<Boolean> get() = _emptyList
 
+    private val _errorVis = MutableStateFlow("")
+    val errorVis: StateFlow<String> get() = _errorVis
+
     private var currentPage = 0
+
+    init {
+        startState()
+    }
 
     private fun fetchMoviesFromApi(page: Int) {
         viewModelScope.launch {
             try {
                 val response = apiService.getMovieResponse(
                     language = Locale.getDefault().language,
-                    sort = ApiParams.PRIMARY_RELEASE_DATA,
-                    minVoteCountValue = "100",
+                    sort = SettingsResponse.PRIMARY_RELEASE_DATA,
+                    minVoteCountValue = SettingsResponse.minVoteCountValue,
                     page = page.toString()
                 )
                 if (response.isSuccessful) {
@@ -72,15 +76,17 @@ class MovieViewModel @Inject constructor(
                         insertMovieUseCase(movie)
                     }
                 } else {
+                    state.value = (StateScreenUI.Error(response.errorBody()?.string().toString()))
                     fetchMoviesFromDb() // Fallback to DB in case of API error
                 }
             } catch (e: Exception) {
+                state.value = (StateScreenUI.Error(e.message.toString()))
                 fetchMoviesFromDb() // Fallback to DB in case of exception
             }
         }
     }
 
-    fun loadingMovies() {
+    private fun loadingMovies() {
         viewModelScope.launch {
             if (NetworkUtil.isNetworkAvailable(application)) {
                 currentPage++
@@ -95,24 +101,21 @@ class MovieViewModel @Inject constructor(
         }
     }
 
-    fun loadingMore(){
+    fun loadingMore() {
         state.tryEmit(StateScreenUI.LoadingMore)
     }
 
-    fun update(){
+    fun update() {
         state.tryEmit(StateScreenUI.Refreshing)
     }
 
-    init {
-        startState()
-    }
 
-    fun startState() {
+    private fun startState() {
         viewModelScope.launch {
             state.collect {
                 when (it) {
                     StateScreenUI.Loading -> {
-                        if (currentPage == 0){
+                        if (currentPage == 0) {
                             loadingMovies()
                         }
                     }
@@ -122,9 +125,8 @@ class MovieViewModel @Inject constructor(
                     }
 
                     is StateScreenUI.Error -> {
-
+                        _errorVis.value = it.error
                     }
-
 
                     StateScreenUI.LoadingMore -> {
                         loadingMovies()

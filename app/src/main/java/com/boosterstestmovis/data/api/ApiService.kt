@@ -8,10 +8,10 @@ import retrofit2.http.Query
 interface ApiService {
     @GET("movie")
     suspend fun getMovieResponse(
-        @Query("language") language: String,
-        @Query("sort_by") sort: String,
-        @Query("vote_count.gte") minVoteCountValue: String,
-        @Query("vote_average.gte") minVoteAverageValue: String = "7",
-        @Query("page") page: String
+        @Query(ApiParams.LANGUAGE) language: String,
+        @Query(ApiParams.SORT_BY) sort: String,
+        @Query(ApiParams.VOTE_COUNT_GTE) minVoteCountValue: String,
+        @Query(ApiParams.VOTE_AVERAGE_GTE) minVoteAverageValue: String = "7",
+        @Query(ApiParams.PAGE) page: String
     ): Response<MovieResponse>
 }
