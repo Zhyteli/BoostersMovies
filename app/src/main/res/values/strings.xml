@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">BoostersTestMovis</string>
-    <string name="web_token">616608320922-0ej0lbbfl0fdl51q47n2k5bp7c5vhhqq.apps.googleusercontent.com</string>
+    <string name="default_web_client_id">616608320922-ak85gvu2tmkik38fcov0jiln05lq7ro7.apps.googleusercontent.com</string>
 </resources>
