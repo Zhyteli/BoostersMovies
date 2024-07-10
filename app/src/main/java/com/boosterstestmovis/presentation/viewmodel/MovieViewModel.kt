@@ -38,11 +38,8 @@ class MovieViewModel @Inject constructor(
 
     private val getAllMoviesUseCase: GetAllMoviesUseCase,
     private val getAllFavouriteMoviesUseCase: GetAllFavouriteMoviesUseCase,
-    private val getMovieByIdUseCase: GetMovieByIdUseCase,
     private val getFavouriteMovieByIdUseCase: GetFavouriteMovieByIdUseCase,
-    private val deleteAllMoviesUseCase: DeleteAllMoviesUseCase,
     private val insertMovieUseCase: InsertMovieUseCase,
-    private val deleteMovieUseCase: DeleteMovieUseCase,
     private val insertFavouriteMovieUseCase: InsertFavouriteMovieUseCase,
     private val deleteFavouriteMovieUseCase: DeleteFavouriteMovieUseCase,
 
@@ -156,27 +153,11 @@ class MovieViewModel @Inject constructor(
         }
     }
 
-
-    private val allMovies: StateFlow<List<Movie>> = getAllMoviesUseCase()
-        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-
     val allFavouriteMovies: StateFlow<List<FavouriteMovie>> = getAllFavouriteMoviesUseCase()
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    fun getMovieById(movieId: Int): Flow<Movie> {
-        return flow { emit(getMovieByIdUseCase(movieId)) }
-    }
-
     fun getFavouriteMovieById(movieId: Int): Flow<FavouriteMovie> {
         return flow { emit(getFavouriteMovieByIdUseCase(movieId)) }
-    }
-
-    fun insertMovie(movies: List<Movie>) = viewModelScope.launch {
-        insertMovieUseCase(movies)
-    }
-
-    fun deleteMovie(movie: Movie) = viewModelScope.launch {
-        deleteMovieUseCase(movie)
     }
 
     fun insertFavouriteMovie(movie: FavouriteMovie) = viewModelScope.launch {
